@@ -1,0 +1,23 @@
+{
+  "name": "firebasesandbox",
+  "version": "1.0.0",
+  "description": "just practice firebase",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VinHuang/firebaseSandBox.git"
+  },
+  "keywords": [
+    "firebase"
+  ],
+  "author": "ZJ",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VinHuang/firebaseSandBox/issues"
+  },
+  "homepage": "https://github.com/VinHuang/firebaseSandBox#readme",
+  "devDependencies": {}
+}
