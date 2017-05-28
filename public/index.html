@@ -28,11 +28,12 @@
 
     <h2>登入</h2>
     <lable for="accountL"></lable>
-    <input id="accountL" type="text">
+    <input id="accountL" type="email">
     <lable for="pwdL"></lable>
-    <input id="pwdL" type="password">
+    <input id="pwdL" type="password" minlength="6">
     <button type="submit" id="loginSmtBtn">Login</button>
-
+    <button id="currentUserBtn">Check current account</button>
+    <p id="login_error" style="color:red;"></p>
     <h2>登出</h2>
     <button id="signoutSmtBtn">Signout</button>
 
@@ -45,7 +46,8 @@
     <button id="chgPwdBtn">ChangePwd</button>
 
     <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase.js"></script>
-    <script src="sign_up.js"></script>
     <script src="firebase_sdk.js"></script>
+    <script src="sign_up.js"></script>
+    <script src="log_in.js"></script>
   </body>
 </html>
