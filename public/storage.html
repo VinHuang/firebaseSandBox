@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to ZJ's Firebase Sand Box</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/4.0.0/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/4.0.0/firebase-auth.js"></script>
+    <script defer src="/__/firebase/4.0.0/firebase-database.js"></script>
+    <script defer src="/__/firebase/4.0.0/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/4.0.0/firebase-storage.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+  </head>
+  <body>
+
+    <h2>註冊</h2>
+    <lable for="account">電子郵件</lable>
+    <input id="account" type="text">
+    <lable for="pwd">密碼</lable>
+    <input id="pwd" type="password">
+    <lable for="name">姓名</lable>
+    <input id="name" type="text">
+    <lable for="age">年齡</lable>
+    <input id="age" type="number">
+    <button type="submit" id="registerSmtBtn">Signup</button>
+
+    <h2>登入</h2>
+    <lable for="accountL"></lable>
+    <input id="accountL" type="text">
+    <lable for="pwdL"></lable>
+    <input id="pwdL" type="password">
+    <button type="submit" id="loginSmtBtn">Login</button>
+
+    <h2>登出</h2>
+    <button id="signoutSmtBtn">Signout</button>
+
+    <h2>上傳照片</h2>
+    <input id="uploadFileInput" type="file" accept="image/*">
+
+    <h2>取得照片</h2>
+    <button id="getPicBtn">Get</button>
+    <img id="downloadedImg">
+
+    <h2>取得照片資料</h2>
+    <button id="getImgMetaBtn">Get</button>
+
+    <h2>更新照片資料</h2>
+    <button id="setImgMetaBtn">Get</button>
+
+    <h2>刪除照片</h2>
+    <button id="deletePicBtn">Get</button>
+
+    <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase.js"></script>
+    <script>
+    // Initialize Firebase
+    var config = {
+    apiKey: "AIzaSyDFVq597FXLyOnFqVPFPiJXdwrzfnjze5k",
+    authDomain: "zjsandbox-d4dc0.firebaseapp.com",
+    databaseURL: "https://zjsandbox-d4dc0.firebaseio.com",
+    projectId: "zjsandbox-d4dc0",
+    storageBucket: "zjsandbox-d4dc0.appspot.com",
+    messagingSenderId: "668265784196"
+    };
+    firebase.initializeApp(config);
+    var storageRef = firebase.storage().ref();
+    console.log(storageRef);
+
+   //Email/Pwd註冊
+var loginUser;
+var account = document.getElementById("account");
+var pwd = document.getElementById("pwd");
+var registerSmtBtn = document.getElementById("registerSmtBtn");
+var age = document.getElementById("age");
+var name = document.getElementById("name");
+registerSmtBtn.addEventListener("click", function(){
+		console.log(account.value);
+    firebase.auth().createUserWithEmailAndPassword(account.value, pwd.value).then(function(){
+    }).catch(function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMsg = error.message;
+    console.log(errorMsg);
+  });
+},false);
+
+//登入
+var accountL = document.getElementById("accountL");
+var pwdL = document.getElementById("pwdL");
+var loginSmtBtn = document.getElementById("loginSmtBtn");
+loginSmtBtn.addEventListener("click",function(){
+	firebase.auth().signInWithEmailAndPassword(accountL.value, pwdL.value).catch(function(error) {
+  	// Handle Errors here.
+  	var errorCode = error.code;
+  	var errorMessage = error.message;
+  	console.log(errorMessage);
+  })
+},false);
+
+var loginUser;
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+  	loginUser = user;
+    console.log("User is logined", user)
+  } else {
+  	loginUser = null;
+    console.log("User is not logined yet.");
+  }
+});
+
+var signoutSmtBtn = document.getElementById("signoutSmtBtn");
+signoutSmtBtn.addEventListener("click",function(){
+	firebase.auth().signOut().then(function() {
+		console.log("User sign out!");
+	}, function(error) {
+  	console.log("User sign out error!");
+	})
+},false);
+
+var uploadFileInput = document.getElementById("uploadFileInput");
+uploadFileInput.addEventListener("change", function(){
+  // console.log('files',files);
+	var file = this.files[0];
+  var uploadTask = storageRef.child('images/'+file.name).put(file);
+  uploadTask.on('state_changed', function(snapshot){
+    // Observe state change events such as progress, pause, and resume
+    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+    var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    console.log('Upload is ' + progress + '% done');
+    switch (snapshot.state) {
+      case firebase.storage.TaskState.PAUSED: // or 'paused'
+        console.log('Upload is paused');
+        break;
+      case firebase.storage.TaskState.RUNNING: // or 'running'
+        console.log('Upload is running');
+        break;
+    }
+  }, function(error) {
+    // Handle unsuccessful uploads
+  }, function() {
+    // Handle successful uploads on complete
+    // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+    var downloadURL = uploadTask.snapshot.downloadURL;
+  });
+},false);
+
+var getPicBtn = document.getElementById("getPicBtn");
+var downloadedImg = document.getElementById("downloadedImg");
+getPicBtn.addEventListener("click", function(){
+	var pathReference = storageRef.child('images/rs.png');
+	pathReference.getDownloadURL().then(function(url) {
+  	downloadedImg.src = url;
+  })
+}, false)
+
+var getImgMetaBtn = document.getElementById("getImgMetaBtn");
+getImgMetaBtn.addEventListener("click", function(){
+	// Get metadata properties
+  storageRef.child('images/rs.png').getMetadata().then(function(metadata) {
+    console.log("取得照片資料",metadata);
+  }).catch(function(error) {
+    // Uh-oh, an error occurred!
+  });
+}, false);
+
+var setImgMetaBtn = document.getElementById("setImgMetaBtn");
+setImgMetaBtn.addEventListener("click", function(){
+	var newMetadata = {
+    cacheControl: 'public,max-age=300',
+    customMetadata: {
+      'location': 'Yosemite, CA, USA',
+      'activity': 'Hiking'
+    }
+  }
+
+  // Update metadata properties
+  storageRef.child('images/rs.png').updateMetadata(newMetadata).then(function(metadata) {
+    console.log("更新後的照片資料：",metadata);
+  }).catch(function(error) {
+    // Uh-oh, an error occurred!
+  });
+},false)
+
+var deletePicBtn = document.getElementById("deletePicBtn");
+deletePicBtn.addEventListener("click", function(){
+  storageRef.child('images/rs.png').delete().then(function() {
+    console.log("R2被刪除了");
+  }).catch(function(error) {
+    // Uh-oh, an error occurred!
+  });
+},false);
+    </script>
+  </body>
+</html>
